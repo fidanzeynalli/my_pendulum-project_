@@ -1,0 +1,7 @@
+path: C:\Users\payal\Desktop\New folder\bitirme_-devim-main\bitirme_-devim-main\pendulum-project\data
+train: images/train
+val: images/val
+test: images/test
+
+nc: 1
+names: ['ball']

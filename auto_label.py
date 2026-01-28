@@ -7,8 +7,11 @@ from ultralytics import YOLO
 def run_auto_labeling(video_path, model_path, conf=0.1):
     model = YOLO(model_path)
     cap = cv2.VideoCapture(video_path)
-    img_dir = "data/auto_labels/session_1/images"
-    lbl_dir = "data/auto_labels/session_1/labels"
+    
+    # [DEĞİŞİKLİK B] Session 2 klasörleri
+    img_dir = "data/auto_labels/session_2/images"
+    lbl_dir = "data/auto_labels/session_2/labels"
+    
     os.makedirs(img_dir, exist_ok=True)
     os.makedirs(lbl_dir, exist_ok=True)
 
@@ -19,8 +22,10 @@ def run_auto_labeling(video_path, model_path, conf=0.1):
         
         results = model.predict(frame, conf=conf, verbose=False)
         if len(results[0].boxes) > 0:
-            img_name = f"frame_{count}.jpg"
-            lbl_name = f"frame_{count}.txt"
+            # [DEĞİŞİKLİK C] Dosya isimleri 'hizli_' ile başlasın
+            img_name = f"hizli_{count}.jpg"
+            lbl_name = f"hizli_{count}.txt"
+            
             cv2.imwrite(os.path.join(img_dir, img_name), frame)
             
             # Sınıfı 0 (Sarkaç) olarak zorla ve kaydet
@@ -34,8 +39,9 @@ def run_auto_labeling(video_path, model_path, conf=0.1):
     print(f"✅ Etiketleme bitti. Tüm nesneler 'Sarkaç (0)' olarak kaydedildi.")
 
 def distribute_data():
-    src_images = "data/auto_labels/session_1/images"
-    src_labels = "data/auto_labels/session_1/labels"
+    # [DEĞİŞİKLİK D] Dağıtım kaynağı Session 2 olsun
+    src_images = "data/auto_labels/session_2/images"
+    src_labels = "data/auto_labels/session_2/labels"
     
     if not os.path.exists(src_images):
         print("❌ Hata: Kaynak resim klasörü bulunamadı!")
@@ -52,7 +58,7 @@ def distribute_data():
     train_count = int(total * 0.82)
     val_count = int(total * 0.09)
     
-    # Hedef klasörleri hazırlama
+    # Hedef klasörleri hazırlama (Bunlar sabit kalır, ortak havuz)
     for t in ["train", "val", "test"]:
         os.makedirs(f"data/images/{t}", exist_ok=True)
         os.makedirs(f"data/labels/{t}", exist_ok=True)
@@ -69,8 +75,12 @@ def distribute_data():
 
 if __name__ == "__main__":
     # AYARLAR:
-    VIDEO_PATH = "data/videos/temp_video.mp4" 
-    MODEL_PATH = "yolov8s.pt" # Henüz best.pt olmadığı için genel model kullanıyoruz
+    # [DEĞİŞİKLİK A] Yeni video yolu
+    VIDEO_PATH = "data/videos/hizli_video.mp4" 
+    
+    # İpucu: Eğer daha önceki eğitiminden çıkan 'best.pt' varsa buraya onun yolunu yazabilirsin.
+    # Yoksa 'yolov8s.pt' ile devam et.
+    MODEL_PATH = "yolov8s.pt" 
     
     # ÖNCE Etiketle
     run_auto_labeling(VIDEO_PATH, MODEL_PATH, conf=0.1)
